@@ -1,0 +1,9 @@
+requests
+numpy
+sklearn
+scipy
+h5py
+matplotlib
+pillow
+tensorflow
+

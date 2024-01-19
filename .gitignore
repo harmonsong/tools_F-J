@@ -1,0 +1,34 @@
+*.npz
+*.asv
+*.png
+Structure
+*.geojson
+*.kmz
+*.pyc
+*.llz
+tempCodeRunnerFile*
+*/__pycache__*
+
+project*
+
+*.so
+*test*
+
+disperNet_trainset
+#output*
+nohup*
+CC*
+data*
+Qfaults*
+model
+
+# dirname
+lsf_out
+pbs_out
+*ipynb_checkpoints*
+# filename
+a-project.yml
+a-project_repar.yml
+0_config.yml
+
+.vscode
