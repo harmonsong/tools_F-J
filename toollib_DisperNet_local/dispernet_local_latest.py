@@ -30,9 +30,9 @@ import pandas as pd
 import extractor
 import yaml
 
-#import sys
-#sys.path.append(r'../')
-#from toollib_standard import plotlib
+import sys
+sys.path.append(r'../tools_F-J/')
+from toollib_standard import plotlib
 
 np.set_printoptions(suppress=True)
 
@@ -1010,8 +1010,18 @@ class App(object):
 		
 		self.url = url
 		
-		self.fileList = self.get_file_list(filePath, end='.h5')
-		self.fileList = self.natural_sort(self.fileList)
+
+		#self.fileList = self.get_file_list(filePath, end='.h5')
+		#self.fileList = self.natural_sort(self.fileList)
+
+		fileList = self.get_file_list(filePath, end='.h5')
+		num_fileList = [int(file[file.find('--')+2:file.find('.h5')]) for file in fileList ]
+		index = np.argsort(num_fileList)
+		fileList = np.array(fileList)[index]
+		self.fileList = list(fileList)
+
+
+
 		self.filePath = filePath  + '/'
 		if self.fileList == []:
 			raise IOError('No *.h5 file found in the given Path, please check. \nYou can use the function dispernet.save2h5 to transfer the sptectrum to the specific *.h5 file')
