@@ -229,25 +229,28 @@ if __name__ == '__main__':
         elif 'select' in key:
             start = int(key[key.find('_')+1:key.find('_', key.find('_') + 1)])
             end = int(key[key.find('_', key.find('_') + 1)+1:])
-            key_all = [int(x[3:x.index('curve.txt')]) for x in os.listdir(dir_data) if x.endswith('.txt')]
+            key_all = [x[3:x.index('curve.txt')] for x in os.listdir(dir_data) if x.endswith('.txt')]
 
-            key_all.sort()
+            #key_all.sort()
             key_all = [str(x) for x in key_all]
 
             key = []
             #print(key_all)
             data_collections = []
-            for key_this in key_all[start:end+1]:
+            for key_this in key_all[start:end]:
                 if os.path.exists(dir_output+'/ds_'+key_this+'curve/'):
                     shutil.rmtree(dir_output+'/ds_'+key_this+'curve/')
                 os.makedirs(dir_output+'/ds_'+key_this+'curve/')
                 data_collections.append('ds_'+key_this+'curve.txt')
                 key = key_this
+            print(key)
         else:
             if os.path.exists(dir_output+'/ds_'+key+'curve/'):
                 shutil.rmtree(dir_output+'/ds_'+key+'curve/')
             os.makedirs(dir_output+'/ds_'+key+'curve/')
             data_collections = ['ds_'+key+'curve.txt']
+        
+        #print(key)
         process = InversionMultiple(range(1, size), config, data_collections,
                                     num_init)
         process.run(key)
