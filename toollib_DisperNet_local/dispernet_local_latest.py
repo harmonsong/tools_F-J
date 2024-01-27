@@ -286,18 +286,20 @@ def show_partrition(self):
 		if '_' in key_subwork:
 			key_subwork = key_subwork[:key_subwork.find('_')]
 
-		stainfo = self.sta_info_all[key_subwork]
-		stalist = stainfo['Station'].tolist()
-		lat = stainfo['latitude'].tolist() 
-		lon = stainfo['longitude'].tolist()
+		sta_info_all = self.sta_info_all
+
+		stalist = sta_info_all['stations'][key_subwork]
+		lat = sta_info_all['lat'][key_subwork]
+		lon = sta_info_all['lon'][key_subwork]
+
 		self.ax_partrition.cla()
 		self.ax_partrition =plotlib.plot_area(self.ax_partrition,lon_all,lat_all,lon,lat,markersize = 1 ,markersize2 = 4)
 		if faults is not None:
 			for i in range(len(faults)):
 				self.ax_partrition.plot(faults['clark'+str(i+1)]['lon'], faults['clark'+str(i+1)]['lat'], 'k')
 
-		lon_this = self.loc_info['lon_centroid'][self.key_subworks.index(key_subwork)]
-		lat_this = self.loc_info['lat_centroid'][self.key_subworks.index(key_subwork)]
+		lon_this = np.mean(lon)
+		lat_this = np.mean(lat)
 		self.ax_partrition.scatter(lon_this,lat_this,marker='^',color='g',s=40)
 
 		self.ax_partrition.axis('off')
@@ -775,8 +777,8 @@ def del_curve_by_mode(curves, mode):
 	return np.array(reCurve)
 
 def find_nearset(self,key_subwork,key_all,loc_all):
-	lon_this = self.loc_info['lon_centroid'][self.key_subworks.index(key_subwork)]
-	lat_this = self.loc_info['lat_centroid'][self.key_subworks.index(key_subwork)]
+	lon_this = self.loc_info[key_subwork][0]
+	lat_this = self.loc_info[key_subwork][1]
 	lon_all = []
 	lat_all = []
 	key_file_all = [str(key) for key in loc_all['key_subwork'].tolist()]
@@ -1082,8 +1084,18 @@ class App(object):
 		
 
 		# read station info
-		loc_info = pd.read_excel(self.dir_project+'subwork_location.xlsx',sheet_name='location')
+		#loc_info = pd.read_excel(self.dir_project+'subwork_location.xlsx',sheet_name='location')
+		#self.loc_info = loc_info
+		loc_info = {}
+		for key_subwork in self.info_basic['key_subworks']:
+			filePath = self.dir_project + self.info_basic['dir_partition'] + str(key_subwork) + '.txt'
+			stations, lat, lon = np.loadtxt(filePath, dtype='str' , unpack=True)
+			stations = stations.tolist()
+			lat = lat.tolist()
+			lon = lon.tolist()
+			loc_info[key_subwork] = [np.mean(np.array(lon).astype(float)),np.mean(np.array(lat).astype(float))]
 		self.loc_info = loc_info
+			
 
 		# find this key
 		key_this = self.fileName[self.fileName.find('_')+1:self.fileName.find('.')]
@@ -1157,8 +1169,23 @@ class App(object):
 			show(self.spec_or,self.curve,r_this = self.r_this,freq=self.freq, velo=self.velo, s=15,ax=self.ax2,holdon=True, cmap=self.cmap, vmin=self.vmin, vmax=self.vmax, autoT=self.autoT)
 		show(self.spec,self.curve,r_this = self.r_this,freq=self.freq, velo=self.velo, s=15,ax=self.ax1,holdon=True, cmap=self.cmap, vmin=self.vmin, vmax=self.vmax, autoT=self.autoT)
 		if self.flag_plot_partrition == 1:
-			sta_info_all = pd.read_excel(self.dir_project+self.info_basic['stalistname'],sheet_name=None)
+			#sta_info_all = pd.read_excel(self.dir_project+self.info_basic['stalistname'],sheet_name=None)
+			#self.sta_info_all = sta_info_all
+			sta_info_all = {}
+			stations = {}
+			lat = {}
+			lon = {}
+			for key_subwork in self.key_subworks:
+				filePath = self.dir_project + self.info_basic['dir_partition'] + str(key_subwork) + '.txt'
+				stations_this, lat_this, lon_this = np.loadtxt(filePath, dtype='str' , unpack=True)
+				stations[key_subwork] = stations_this.tolist()
+				lat[key_subwork] = lat_this.astype(float).tolist()
+				lon[key_subwork] = lon_this.astype(float).tolist()
+			sta_info_all['stations'] = stations
+			sta_info_all['lat'] = lat
+			sta_info_all['lon'] = lon
 			self.sta_info_all = sta_info_all
+
 			show_partrition(self)
 		
 		
