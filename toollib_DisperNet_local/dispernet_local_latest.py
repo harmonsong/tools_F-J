@@ -812,7 +812,7 @@ class App(object):
 	periodCutRate=[]
 	semiVeloRange=0.1
 	
-	def __init__(self,info_basic,lon_all,lat_all,faults = None,file_project='a-project.yml',flag_plot_or = 0,flag_plot_partrition=0 ,r_flag  = 0,oldfile='None',oldkeys=[],fundfile='None',overfile = 'None',fundkeys=[],filePath='./', curveFilePath = '', freqSeries=[], cmap='viridis', vmin=None, vmax=None, url='http://10.20.11.42:8514', maxMode=0, trigerMode=False , searchStep=2, autoT=True, periodCutRate=0.125, semiAutoRange=0.1):
+	def __init__(self,info_basic,lon_all,lat_all,fileList,faults = None,file_project='a-project.yml',flag_plot_or = 0,flag_plot_partrition=0 ,r_flag  = 0,oldfile='None',oldkeys=[],fundfile='None',overfile = 'None',fundkeys=[],filePath='./', curveFilePath = '', freqSeries=[], cmap='viridis', vmin=None, vmax=None, url='http://10.20.11.42:8514', maxMode=0, trigerMode=False , searchStep=2, autoT=True, periodCutRate=0.125, semiAutoRange=0.1):
 		self.flag_plot_partrition = flag_plot_partrition	
 		self.flag_plot_or = flag_plot_or
 		self.r_flag = r_flag
@@ -1013,13 +1013,14 @@ class App(object):
 
 		#self.fileList = self.get_file_list(filePath, end='.h5')
 		#self.fileList = self.natural_sort(self.fileList)
-
+		"""
 		fileList = self.get_file_list(filePath, end='.h5')
 		num_fileList = [int(file[file.find('--')+2:file.find('.h5')]) for file in fileList ]
 		index = np.argsort(num_fileList)
 		fileList = np.array(fileList)[index]
 		self.fileList = list(fileList)
-
+		"""
+		self.fileList = fileList
 
 
 		self.filePath = filePath  + '/'
