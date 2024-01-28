@@ -39,12 +39,6 @@ import openpyxl
 np.set_printoptions(suppress=True)
 
 
-
-
-
-
-
-
 def pick(spec, threshold=0.5, freq=[0.,0.3], velo=[2000, 6000], net='noise', errorbar=False, flipUp=False, searchStep=10, searchBorder=0, returnSpec=False, ind=-1, url='useless'):
 	
 	spec[np.isnan(spec)] = 0
@@ -649,7 +643,7 @@ def curveInterp(curve, freqSeries=[], autoReSeparation=True):
 		
 	return np.squeeze(outputCurve)
 	
-def curveSmooth(curve, sigma=1):
+def curveSmooth(curve, sigma=10):
 
 	for mode in range(int(max(curve[:,2])+1)):
 		curveInMode = curve[curve[:,-1] == mode]
@@ -657,8 +651,10 @@ def curveSmooth(curve, sigma=1):
 		curve_smooth = sn.gaussian_filter1d(curveInMode[:,1],sigma)
 		curve[curve[:,2]==mode,1] = curve_smooth
 		curve[curve[:,2]==mode,0] = curveInMode[:,0]
+	print('sigma =', sigma )
 		
 	return curve
+
 	
 def extract(spec, threshold=0.5, freq=[0.,0.3], velo=[2000, 6000], net='noise', mode=0, leapLimit=0.1, freqLimits=[], freqSeries=[], errorbar=False, flipUp=False, searchStep=10, searchBorder=0, returnSpec=False, maxMode=15, ind=-1, url = 'http://10.20.11.42:8514'):
 	curve = pick(spec, threshold, freq, velo, net, errorbar, flipUp, searchStep, searchBorder, returnSpec, ind, url)
@@ -1102,7 +1098,7 @@ class App(object):
 			self.ax1.set_title('Please Devide the curve to different mode FIRST!!')
 			return
 		
-		self.curve = curveSmooth(self.curve, 1)
+		self.curve = curveSmooth(self.curve, sigma=10)
 		self.ax1.cla()
 		if self.freq_type_preset == 'Period':
 			curveP = self.curve.copy()

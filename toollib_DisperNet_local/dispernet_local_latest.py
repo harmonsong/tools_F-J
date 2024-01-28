@@ -1404,7 +1404,7 @@ class App(object):
 			self.ax1.set_title('Please Divide the curve to different mode FIRST!!')
 			return
 		
-		self.curve = curveSmooth(self.curve, 1)
+		self.curve = curveSmooth(self.curve, sigma=10)
 		self.ax1.cla()
 		if self.freq_type_preset == 'Period':
 			curveP = self.curve.copy()
