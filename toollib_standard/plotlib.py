@@ -13,6 +13,7 @@ import time
 from geopy.distance import great_circle
 import folium
 import matplotlib.pyplot as plt
+import pandas as pd
 
 from toollib_standard import mathlib
 
@@ -213,3 +214,15 @@ def plot_area(ax,lon_all,lat_all,lon,lat,markersize=2,markersize2 = 2):
     ax.set_ylabel('Latitude')
     #ax.set_title('Station distribution')
     return ax
+
+# smooth for F-J spectrogram
+def smooth_ds(ds,level_f=10,level_c=5):
+    ds_smooth = ds.T
+    ds_smooth = pd.DataFrame(ds_smooth)
+    ds_smooth = ds_smooth.rolling(level_f).mean()
+    ds_smooth = np.array(ds_smooth)
+    ds_smooth = ds_smooth.T
+    ds_smooth = pd.DataFrame(ds_smooth)
+    ds_smooth = ds_smooth.rolling(level_c).mean()
+    ds_smooth = np.array(ds_smooth)
+    return ds_smooth

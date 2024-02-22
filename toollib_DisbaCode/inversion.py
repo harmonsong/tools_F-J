@@ -232,18 +232,19 @@ if __name__ == '__main__':
             key_all = [x[3:x.index('curve.txt')] for x in os.listdir(dir_data) if x.endswith('.txt')]
 
             #key_all.sort()
-            key_all = [str(x) for x in key_all]
+            #key_all = [str(x) for x in key_all]
 
             key = []
             #print(key_all)
             data_collections = []
+            #print(key_all)
             for key_this in key_all[start:end]:
                 if os.path.exists(dir_output+'/ds_'+key_this+'curve/'):
                     shutil.rmtree(dir_output+'/ds_'+key_this+'curve/')
                 os.makedirs(dir_output+'/ds_'+key_this+'curve/')
                 data_collections.append('ds_'+key_this+'curve.txt')
                 key = key_this
-            print(key)
+            #print(key)
         else:
             if os.path.exists(dir_output+'/ds_'+key+'curve/'):
                 shutil.rmtree(dir_output+'/ds_'+key+'curve/')
