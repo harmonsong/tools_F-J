@@ -59,7 +59,7 @@ class InversionMultiple(object):
     def terminate_slaves(self):
         self.master.terminate_slaves()
 
-    def run(self,key):
+    def run(self):
         if self.njobs == 1:
             self.options['disp'] = True
         else:
@@ -69,7 +69,7 @@ class InversionMultiple(object):
         #print(self.file_data)
         num_model = self.num_model
 
-        xs = self.create_init(key)
+        xs = self.create_init()
         
 
 
@@ -128,8 +128,8 @@ class InversionMultiple(object):
                                  '{:d}.npz'.format(ind_mi), **res)
                 time.sleep(0.03)
 
-    def create_init(self,key):
-        filename = self.model_init + key + '.txt'
+    def create_init(self):
+        filename = self.model_init + '.txt'
         model_init = np.loadtxt(filename)
         num_layer = model_init.shape[0]
         num_model = self.num_model
@@ -188,12 +188,14 @@ if __name__ == '__main__':
                         help='number of initial model')
     parser.add_argument('--key',  default='all')
     parser.add_argument('--key_init',  default='all')
+    parser.add_argument('--init_tag',default='1')
 
     args = parser.parse_args()
     file_config = args.config
     num_init = args.num_init
 
     key = args.key
+    tag = str(args.init_tag)
 
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
@@ -260,7 +262,7 @@ if __name__ == '__main__':
         #print(key)
         process = InversionMultiple(range(1, size), config, data_collections,
                                     num_init)
-        process.run(key)
+        process.run()
         process.terminate_slaves()
     else:
         InversionOne().run()

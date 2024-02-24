@@ -73,8 +73,8 @@ class ObjectiveFunctionDerivativeFree:
         #print(file_data)
         index_start = file_data.index('ds_') + len('ds_')
         index_end = file_data.index('curve')
-        key = str(file_data[index_start:index_end])
-        filename = self.file_model_init+ key + '.txt'
+        #key = str(file_data[index_start:index_end])
+        filename = self.file_model_init + '.txt'
         #model_init = np.loadtxt(self.file_model_init)
         model_init = np.loadtxt(filename)
         num_layer = model_init.shape[0]
@@ -219,7 +219,7 @@ class ObjectiveFunctionDerivativeUsed(ObjectiveFunctionDerivativeFree):
         index_start = file_data.index('ds_') + len('ds_')
         index_end = file_data.index('curve')
         key = str(file_data[index_start:index_end])
-        filename = self.file_model_init+ key + '.txt'
+        filename = self.file_model_init + '.txt'
         model_init = np.loadtxt(filename)
         num_layer = model_init.shape[0]
         self.model_init = model_init
