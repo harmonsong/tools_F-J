@@ -188,14 +188,12 @@ if __name__ == '__main__':
                         help='number of initial model')
     parser.add_argument('--key',  default='all')
     parser.add_argument('--key_init',  default='all')
-    parser.add_argument('--init_tag',default='1')
 
     args = parser.parse_args()
     file_config = args.config
     num_init = args.num_init
 
     key = args.key
-    tag = str(args.init_tag)
 
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
@@ -215,7 +213,6 @@ if __name__ == '__main__':
         #os.makedirs(dir_output)
 
         dir_data = config['dir_data']
-
         
 
         if key == 'all':
@@ -242,22 +239,34 @@ if __name__ == '__main__':
             #key_all.sort()
             #key_all = [str(x) for x in key_all]
 
-            key = []
+            key = key_all[start:end]
             #print(key_all)
             data_collections = []
             #print(key_all)
-            for key_this in key_all[start:end]:
+            for key_this in key:
                 if os.path.exists(dir_output+'/ds_'+key_this+'curve/'):
                     shutil.rmtree(dir_output+'/ds_'+key_this+'curve/')
                 os.makedirs(dir_output+'/ds_'+key_this+'curve/')
                 data_collections.append('ds_'+key_this+'curve.txt')
-                key = key_this
             #print(key)
         else:
             if os.path.exists(dir_output+'/ds_'+key+'curve/'):
                 shutil.rmtree(dir_output+'/ds_'+key+'curve/')
             os.makedirs(dir_output+'/ds_'+key+'curve/')
             data_collections = ['ds_'+key+'curve.txt']
+            key = [key]
+        dir_initial = 'initial/'
+        filename = dir_initial + 'initial_tag.yaml'
+        if os.path.exists(filename):
+            with open(filename, 'r') as fp:
+                initial_tag = yaml.safe_load(fp)
+        else:
+            initial_tag = {}
+        tag = config['model_init'].split('_')[-1]
+        for key in key:
+            initial_tag[key] = tag
+        with open(filename, 'w') as fp:
+            yaml.dump(initial_tag, fp)
         
         #print(key)
         process = InversionMultiple(range(1, size), config, data_collections,
@@ -266,3 +275,4 @@ if __name__ == '__main__':
         process.terminate_slaves()
     else:
         InversionOne().run()
+
