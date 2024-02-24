@@ -229,7 +229,13 @@ if __name__ == '__main__':
         elif 'select' in key:
             start = int(key[key.find('_')+1:key.find('_', key.find('_') + 1)])
             end = int(key[key.find('_', key.find('_') + 1)+1:])
-            key_all = [x[3:x.index('curve.txt')] for x in os.listdir(dir_data) if x.endswith('.txt')]
+            key_all_or = [x[3:x.index('curve.txt')] for x in os.listdir(dir_data) if x.endswith('.txt')]
+
+            # sort
+            num = [int(x[:x.find('--')]) for x in key_all_or]
+            index = np.argsort(num)
+            key_all = np.array(key_all_or)[index]
+
 
             #key_all.sort()
             #key_all = [str(x) for x in key_all]
