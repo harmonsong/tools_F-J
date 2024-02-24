@@ -199,6 +199,7 @@ if __name__ == '__main__':
     rank = comm.Get_rank()
     size = comm.Get_size()
 
+
     #time0 = time.time()
     #print(rank, size)
 
@@ -213,8 +214,6 @@ if __name__ == '__main__':
         #os.makedirs(dir_output)
 
         dir_data = config['dir_data']
-        
-
         if key == 'all':
             if os.path.exists(dir_output):
                 shutil.rmtree(dir_output)
@@ -249,6 +248,17 @@ if __name__ == '__main__':
                 os.makedirs(dir_output+'/ds_'+key_this+'curve/')
                 data_collections.append('ds_'+key_this+'curve.txt')
             #print(key)
+        elif 'num' in key:
+            num = key[key.find('_')+1:]
+            key_all_or = [x[3:x.index('curve.txt')] for x in os.listdir(dir_data) if x.endswith('.txt')]
+            for key_this in key_all_or:
+                if num == key_this.split('--')[0]:
+                    key = key_this
+            if os.path.exists(dir_output+'/ds_'+key+'curve/'):
+                shutil.rmtree(dir_output+'/ds_'+key+'curve/')
+            os.makedirs(dir_output+'/ds_'+key+'curve/')
+            data_collections = ['ds_'+key+'curve.txt']
+            key = [key]
         else:
             if os.path.exists(dir_output+'/ds_'+key+'curve/'):
                 shutil.rmtree(dir_output+'/ds_'+key+'curve/')
