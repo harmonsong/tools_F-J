@@ -273,38 +273,48 @@ def show(spec,curve,r_this = 0,freq=[0.,0.3], velo=[2000, 6000], unit=[], s=10, 
 	if not holdon:
 		plt.show()
 
-def show_partrition(self):
-		info_basic = self.info_basic
-		faults = self.faults
-		lat_all = self.lat_all
-		lon_all = self.lon_all
+def show_partition(self):
+	info_basic = self.info_basic
+	faults = self.faults
+	lat_all = self.lat_all
+	lon_all = self.lon_all
 
-		lat = []
-		lon = []
+	lat = []
+	lon = []
 
-		key_subwork = self.fileName[self.fileName.find('_')+1:self.fileName.find('.')]
-		if '_' in key_subwork:
-			key_subwork = key_subwork[:key_subwork.find('_')]
+	key_subwork = self.fileName[self.fileName.find('_')+1:self.fileName.find('.')]
+	if '_' in key_subwork:
+		key_subwork = key_subwork[:key_subwork.find('_')]
 
-		sta_info_all = self.sta_info_all
+	sta_info_all = self.sta_info_all
 
-		stalist = sta_info_all['stations'][key_subwork]
-		lat = sta_info_all['lat'][key_subwork]
-		lon = sta_info_all['lon'][key_subwork]
+	stalist = sta_info_all['stations'][key_subwork]
+	lat = sta_info_all['lat'][key_subwork]
+	lon = sta_info_all['lon'][key_subwork]
 
-		self.ax_partrition.cla()
-		self.ax_partrition =plotlib.plot_area(self.ax_partrition,lon_all,lat_all,lon,lat,markersize = 1 ,markersize2 = 4)
-		if faults is not None:
-			for i in range(len(faults)):
-				self.ax_partrition.plot(faults['clark'+str(i+1)]['lon'], faults['clark'+str(i+1)]['lat'], 'k')
+	self.ax_partition.cla()
+	self.ax_partition =plotlib.plot_area(self.ax_partition,lon_all,lat_all,lon,lat,markersize = 1 ,markersize2 = 4)
+	if faults is not None:
+		for i in range(len(faults)):
+			self.ax_partition.plot(faults['clark'+str(i+1)]['lon'], faults['clark'+str(i+1)]['lat'], 'k')
 
-		lon_this = np.mean(lon)
-		lat_this = np.mean(lat)
-		self.ax_partrition.scatter(lon_this,lat_this,marker='^',color='g',s=40)
+	loc_all = self.loc_info
+	lon_all = []
+	lat_all = []
+	for key in loc_all.keys():
+		if key != key_subwork:
+			lon_all.append(loc_all[key][0])
+			lat_all.append(loc_all[key][1])
+	self.ax_partition.scatter(lon_all,lat_all,marker='^',color='y',s=10)
 
-		self.ax_partrition.axis('off')
-		plt.draw()
-		plt.show()
+
+	lon_this = np.mean(lon)
+	lat_this = np.mean(lat)
+	self.ax_partition.scatter(lon_this,lat_this,marker='^',color='g',s=40)
+	
+	self.ax_partition.axis('off')
+	plt.draw()
+	plt.show()
 		
 def save2h5(spectrum, freq, velo, fileName='',spectrum_or = []):
 	if fileName == '':
@@ -776,6 +786,28 @@ def del_curve_by_mode(curves, mode):
 			reCurve.append(point)
 	return np.array(reCurve)
 
+def find_nearset_self(self,key_subwork,key_all,loc_all):
+	lon_this = self.loc_info[key_subwork][0]
+	lat_this = self.loc_info[key_subwork][1]
+	lon_all = []
+	lat_all = []
+	key_file_all = []
+	for key in loc_all.keys():
+		if key in key_all:
+			lon_all.append(loc_all[key][0])
+			lat_all.append(loc_all[key][1])
+			key_file_all.append(key)
+
+	#lon_all = loc_all['lon_centroid']
+	#lat_all = loc_all['lat_centroid']
+	# 找到最近的
+	dist = np.sqrt((lon_all-lon_this)**2+(lat_all-lat_this)**2)
+	indx = np.argsort(dist)
+	key_nearset = key_file_all[indx[0]]
+	lon_nearset = lon_all[indx[0]]
+	lat_nearset = lat_all[indx[0]]
+	return key_nearset,lon_nearset,lat_nearset
+
 def find_nearset(self,key_subwork,key_all,loc_all):
 	lon_this = self.loc_info[key_subwork][0]
 	lat_this = self.loc_info[key_subwork][1]
@@ -853,7 +885,7 @@ class App(object):
 		plt.subplots_adjust(bottom=0.15, right=0.75,left = 0.05,top=0.95)
 		#self.ax3 = plt.subplot(221)
 		if flag_plot_partrition == 1:
-			self.ax_partrition = plt.axes([0.75, 0.0, 0.25, 0.35])  # 左下角坐标为 (0, 0)，宽度和高度为 0.2
+			self.ax_partition = plt.axes([0.75, 0.0, 0.25, 0.35])  # 左下角坐标为 (0, 0)，宽度和高度为 0.2
 		
 		
 		
@@ -1186,7 +1218,7 @@ class App(object):
 			sta_info_all['lon'] = lon
 			self.sta_info_all = sta_info_all
 
-			show_partrition(self)
+			show_partition(self)
 		
 		
 		self.ax1.set_title(self.fileName)
@@ -1234,7 +1266,7 @@ class App(object):
 				self.curve = self.curve_old
 		show(self.spec,self.curve,r_this = self.r_this,freq=self.freq, velo=self.velo, s=15,ax=self.ax1,holdon=True, cmap=self.cmap, vmin=self.vmin, vmax=self.vmax, autoT=self.autoT)
 		if self.flag_plot_partrition == 1:
-			show_partrition(self)
+			show_partition(self)
 		if self.flag_plot_or == 1:
 			#self.show_or()
 			self.ax2.cla()
@@ -1281,7 +1313,7 @@ class App(object):
 		if key_this in key_all:
 			key_all.remove(key_this)
 
-		key_find = find_nearset(self,key_this,key_all,self.loc_info)
+		key_find,lon_find,lat_find = find_nearset_self(self,key_this,key_all,self.loc_info)
 
 		curve_old_File = self.curveFilePath + 'ds_'+key_find + 'curve.txt'
 
@@ -1301,6 +1333,16 @@ class App(object):
 			#self.show_or()
 			self.ax2.cla()
 			show(self.spec_or,self.curve,r_this = self.r_this,freq=self.freq, velo=self.velo, s=15,ax=self.ax2,holdon=True, cmap=self.cmap, vmin=self.vmin, vmax=self.vmax, autoT=self.autoT)
+		
+		# plot near partition
+		self.ax_partition.scatter(lon_find,lat_find, s=30, c='b', marker='^')
+		sta_info_all = self.sta_info_all
+		stalist = sta_info_all['stations'][key_find]
+		lat = sta_info_all['lat'][key_find]
+		lon = sta_info_all['lon'][key_find]
+		self.ax_partition.plot(lon,lat, 'b*',markersize = 2)
+		#self.ax_partition =plotlib.plot_area(self.ax_partition,lon_all,lat_all,lon,lat,markersize = 1 ,markersize2 = 4)
+		
 		plt.draw()
 
 	def Fundamental(self,event):
@@ -1543,7 +1585,7 @@ class App(object):
 		self.ax1.cla()
 		show(self.spec,self.curve,r_this = self.r_this,freq=self.freq, velo=self.velo, s=15,ax=self.ax1,holdon=True, cmap=self.cmap, vmin=self.vmin, vmax=self.vmax, autoT=self.autoT)
 		if self.flag_plot_partrition == 1:
-			show_partrition(self)
+			show_partition(self)
 		if self.flag_plot_or == 1:
 			#self.show_or()
 			self.ax2.cla()
@@ -1603,7 +1645,7 @@ class App(object):
 		self.ax1.set_title(self.fileName)
 
 		if self.flag_plot_partrition == 1:
-			show_partrition(self)
+			show_partition(self)
 		if self.flag_plot_or == 1:
 			#self.show_or()
 			self.ax2.cla()

@@ -206,7 +206,7 @@ def plot_fj_T(ax,ds_linear,title0,T,c,index):
 
 # plot stations
 def plot_area(ax,lon_all,lat_all,lon,lat,markersize=2,markersize2 = 2):
-    ax.plot(lon_all,lat_all,'b*',markersize=markersize)
+    ax.plot(lon_all,lat_all,'k*',markersize=markersize)
     ax.plot(lon,lat,'r*',markersize=markersize2)
     ax.set_xticks([])  #去掉横坐标值
     ax.set_yticks([])  #去掉纵坐标值
