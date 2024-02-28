@@ -835,6 +835,7 @@ def find_nearset(self,key_subwork,key_all,loc_all):
 	indx = np.argsort(dist)
 	key_nearset = key_all[indx[0]]
 	return key_nearset
+
 		
 class App(object):
 	ind = 0
@@ -856,7 +857,7 @@ class App(object):
 	periodCutRate=[]
 	semiVeloRange=0.1
 	
-	def __init__(self,info_basic,lon_all,lat_all,fileList,faults = None,file_project='a-project.yml',flag_plot_or = 0,flag_plot_partrition=0 ,r_flag  = 0,oldfile='None',oldkeys=[],fundfile='None',overfile = 'None',fundkeys=[],filePath='./', curveFilePath = '', freqSeries=[], cmap='viridis', vmin=None, vmax=None, url='http://10.20.11.42:8514', maxMode=0, trigerMode=False , searchStep=2, autoT=True, periodCutRate=0.125, semiAutoRange=0.1):
+	def __init__(self,info_basic,lon_all,lat_all,fileList,faults = None,file_project='a-project.yml',num_near = 5,flag_plot_or = 0,flag_plot_partrition=0 ,r_flag  = 0,oldfile='None',oldkeys=[],fundfile='None',overfile = 'None',fundkeys=[],filePath='./', curveFilePath = '', freqSeries=[], cmap='viridis', vmin=None, vmax=None, url='http://10.20.11.42:8514', maxMode=0, trigerMode=False , searchStep=2, autoT=True, periodCutRate=0.125, semiAutoRange=0.1):
 		self.flag_plot_partrition = flag_plot_partrition	
 		self.flag_plot_or = flag_plot_or
 		self.r_flag = r_flag
@@ -869,6 +870,7 @@ class App(object):
 		self.overfile = overfile
 
 		self.fundkeys = fundkeys
+		self.num_near = num_near
 
 		self.autoT = True
 		self.periodCutRate=periodCutRate
@@ -1065,7 +1067,6 @@ class App(object):
 		self.fileList = list(fileList)
 		"""
 		self.fileList = fileList
-
 
 		self.filePath = filePath  + '/'
 		if self.fileList == []:
@@ -1359,7 +1360,8 @@ class App(object):
 		plt.show()
 		#self.ax_partition =plotlib.plot_area(self.ax_partition,lon_all,lat_all,lon,lat,markersize = 1 ,markersize2 = 4)
 
-	def AddNear(self,event,num=5):
+	def AddNear(self,event):
+		num = self.num_near
 		key_this = self.fileName[self.fileName.find('_')+1:self.fileName.find('.')]
 		if '_' in key_this:
 			key_this = key_this[:key_this.find('_')]
@@ -1642,7 +1644,7 @@ class App(object):
 			#self.show_or()
 			self.ax2.cla()
 			show(self.spec_or,self.curve,r_this = self.r_this,freq=self.freq, velo=self.velo, s=15,ax=self.ax2,holdon=True, cmap=self.cmap, vmin=self.vmin, vmax=self.vmax, autoT=self.autoT)
-		self.ax1.set_title(self.fileName)
+		self.ax1.set_title(self.fileName+'  '+str(self.ind+1)+'/'+str(len(self.fileList)))
 		
 		if self.freq_type_preset == 'Period':
 			self.axFreqType.cla()
