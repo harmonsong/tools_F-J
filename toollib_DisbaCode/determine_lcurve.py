@@ -24,7 +24,7 @@ class InversionMultiple(object):
         self.work_queue = WorkQueue(self.master)
         self.options = config.get('option_bfgs', dict())
         self.dir_out = config['l-curve']['dir_out']
-        model_init = np.loadtxt(config['model_init']+file_data[0][3:8]+'.txt')
+        model_init = np.loadtxt(config['model_init']+'.txt')
         self.nl = model_init.shape[0]
 
         if os.path.exists(self.dir_out):
