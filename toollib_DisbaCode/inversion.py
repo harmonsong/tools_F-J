@@ -254,11 +254,26 @@ if __name__ == '__main__':
             for key_this in key_all_or:
                 if num == key_this.split('--')[0]:
                     key = key_this
+                    break
             if os.path.exists(dir_output+'/ds_'+key+'curve/'):
                 shutil.rmtree(dir_output+'/ds_'+key+'curve/')
             os.makedirs(dir_output+'/ds_'+key+'curve/')
             data_collections = ['ds_'+key+'curve.txt']
             key = [key]
+        elif 'readfile' in key:
+            file = key[key.find('_')+1:]
+            nums = np.loadtxt(file,dtype='int')  
+            nums = [str(x) for x in nums]
+            key_all_or = [x[3:x.index('curve.txt')] for x in os.listdir(dir_data) if x.endswith('.txt')]
+            key = []
+            data_collections = []
+            for key_this in key_all_or:
+                if key_this.split('--')[0] in nums:
+                    key.append(key_this)
+                    if os.path.exists(dir_output+'/ds_'+key_this+'curve/'):
+                        shutil.rmtree(dir_output+'/ds_'+key_this+'curve/')
+                    os.makedirs(dir_output+'/ds_'+key_this+'curve/')
+                    data_collections.append('ds_'+key_this+'curve.txt')
         else:
             if os.path.exists(dir_output+'/ds_'+key+'curve/'):
                 shutil.rmtree(dir_output+'/ds_'+key+'curve/')
@@ -266,6 +281,8 @@ if __name__ == '__main__':
             data_collections = ['ds_'+key+'curve.txt']
             key = [key]
         dir_initial = 'initial/'
+
+        """
         filename = dir_initial + 'initial_tag.yaml'
         if os.path.exists(filename):
             with open(filename, 'r') as fp:
@@ -277,6 +294,7 @@ if __name__ == '__main__':
             initial_tag[key] = tag
         with open(filename, 'w') as fp:
             yaml.dump(initial_tag, fp)
+        """
         
         #print(key)
         process = InversionMultiple(range(1, size), config, data_collections,
