@@ -8,14 +8,14 @@ from disba import PhaseDispersion
 
 
 class ObjectiveFunctionDerivativeFree:
-    def __init__(self, config, file_data):
-        self._init_config(config, file_data)
+    def __init__(self, config, file_data,dir_this):
+        self._init_config(config, file_data,dir_this)
         self._init_memvar(file_data)
         self._init_model()
         self._init_data()
         self.icov_m = self._get_model_convariance_inv()
 
-    def _init_config(self, config, file_data):
+    def _init_config(self, config, file_data,dir_this):
         self.weights_mode = config.get("weights_mode", None)
         self.norm_damping = config.get("norm_damping", 0.0)
         self.derivative_damping = config.get("derivative_damping", 0.0)
@@ -25,7 +25,7 @@ class ObjectiveFunctionDerivativeFree:
 
         self.smooth = config['smooth']
 
-        dir_data = config["dir_data"]
+        dir_data = dir_this + config["dir_data"]
         self.file_data = os.path.join(dir_data, file_data)
         self.file_model_init = config["model_init"]
         self.half_width = config["init_half_width"]
@@ -197,10 +197,10 @@ class ObjectiveFunctionDerivativeFree:
 
 
 class ObjectiveFunctionDerivativeUsed(ObjectiveFunctionDerivativeFree):
-    def __init__(self, config, file_data):
-        self._init_config(config, file_data)
+    def __init__(self, config, file_data,dir_this = './'):
+        self._init_config(config, file_data,dir_this)
         self._init_memvar()
-        self._init_model(file_data)
+        self._init_model(file_data,dir_this)
         self._init_data()
         self.icov_m = self._get_model_convariance_inv()
         if self.reg_method == "exp":
@@ -212,7 +212,7 @@ class ObjectiveFunctionDerivativeUsed(ObjectiveFunctionDerivativeFree):
         elif self.reg_method == "tr2":
             self._gradient_regularization = self._greg_tr2
 
-    def _init_model(self, file_data):
+    def _init_model(self, file_data,dir_this):
         #if not model_init:
         #    model_init = np.loadtxt(self.file_model_init)
         #key = file_data[3:8]
@@ -220,7 +220,7 @@ class ObjectiveFunctionDerivativeUsed(ObjectiveFunctionDerivativeFree):
         index_end = file_data.index('curve')
         key = str(file_data[index_start:index_end])
         filename = self.file_model_init + '.txt'
-        model_init = np.loadtxt(filename)
+        model_init = np.loadtxt(dir_this + filename)
         num_layer = model_init.shape[0]
         self.model_init = model_init
         self.z = model_init[:, 1]

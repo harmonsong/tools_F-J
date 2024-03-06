@@ -46,9 +46,9 @@ def weighted_avg_and_std(values, weights):
     return (average, np.sqrt(variance))
 
 
-def plot_disp(config, sid, all_disp, ax):
+def plot_disp(config, sid, all_disp, ax,dir_this = './'):
     config_plot = config['plot']
-    dir_output = config['dir_output']
+    dir_output = dir_this + config['dir_output']
     wave_type = config.get('wave_type', 'rayleigh')
     dir_output = os.path.join(dir_output, sid)
 
@@ -77,7 +77,7 @@ def plot_disp(config, sid, all_disp, ax):
 
     # weight *= 1.0 / np.mean(weight) * 0.05
     # weight[weight > 0.1] = 0.1
-    dir_data = config['dir_data']
+    dir_data = dir_this + config['dir_data']
     file_data = os.path.join(dir_data, '{:s}.txt'.format(sid))
     data = np.loadtxt(file_data)
 
@@ -122,13 +122,13 @@ def plot_disp(config, sid, all_disp, ax):
     return ax
 
 
-def plot_model(config_inv, sid, plot_init,file_model_output,file_model_data,ax,file_model_fund = [],plot_fund = 0):
+def plot_model(config_inv, sid, plot_init,file_model_output,file_model_data,ax,file_model_fund = [],plot_fund = 0,dir_this = './'):
     config_plot = config_inv['plot']
     zmax = config_plot['zmax']
     vsmin, vsmax = config_plot['vs_lim']
     #file_model_data = config_plot.get('model_data', None)
     file_model_init = file_model_data
-    dir_output = config_inv['dir_output']
+    dir_output = dir_this + config_inv['dir_output']
     dir_output = os.path.join(dir_output, sid)
     file_data = '{:s}.txt'.format(sid)
     #file_data = dir_proj + file_data
@@ -165,7 +165,7 @@ def plot_model(config_inv, sid, plot_init,file_model_output,file_model_data,ax,f
         km2m = 1
 
     #plt.figure()
-    model_init = np.loadtxt(file_model_init)
+    model_init = np.loadtxt(dir_this + file_model_init)
     z = model_init[:, 1]
     hw = config_inv['init_half_width']
     vs = model_stat
@@ -217,7 +217,7 @@ def plot_model(config_inv, sid, plot_init,file_model_output,file_model_data,ax,f
              alpha=0.8)
     ax.step(vs2_plot, z_plot, '--', c='gray', alpha=0.8)
 
-    of = ObjectiveFunctionDerivativeUsed(config_inv, file_data)
+    of = ObjectiveFunctionDerivativeUsed(config_inv, file_data,dir_this)
     x = (np.asarray(ml) - v1) / (v2 - v1)
     model = of._update_model(x)
     std = np.asarray(sl).reshape(-1, 1)
@@ -229,7 +229,7 @@ def plot_model(config_inv, sid, plot_init,file_model_output,file_model_data,ax,f
     #    print(("{:7.0f}" + "{:12.4f}" * 5).format(*model[i, :]))
 
     if file_model_data:
-        model_data = np.loadtxt(file_model_data)
+        model_data = np.loadtxt(dir_this + file_model_data)
         z = model_data[:, 1]
         z = np.append(z, [
             zmax,
@@ -249,7 +249,7 @@ def plot_model(config_inv, sid, plot_init,file_model_output,file_model_data,ax,f
 
     if plot_init:
         #file_model_init = config_inv['model_init'] + key_subwork + '.txt'
-        model_init = np.loadtxt(file_model_init)
+        model_init = np.loadtxt(dir_this + file_model_init)
         z = model_init[:, 1]
         z = np.append(z, [
             zmax,
@@ -258,12 +258,12 @@ def plot_model(config_inv, sid, plot_init,file_model_output,file_model_data,ax,f
         vs = np.append(vs, [
             vs[-1],
         ])
-        p4, = ax.step(vs, z, 'r-', alpha=0.6)
+        p4, = ax.step(vs, z, 'k-', alpha=0.6,lw=1)
         handles.append(p4)
         labels.append('reference model')
     
     if plot_fund:
-        fund_data = np.loadtxt(file_model_fund)
+        fund_data = np.loadtxt( file_model_fund)
         z = fund_data[:, 1]
         z = np.append(z, [
             zmax,
