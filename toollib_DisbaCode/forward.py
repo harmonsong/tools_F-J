@@ -44,9 +44,9 @@ def forward_cal(info_basic,max_mode,file_model,file_out):
             cp = pd(periods, mode, wave=wave_type)
             disp[mode] = (1.0 / cp.period[::-1], cp.velocity[::-1])
     else:
-        fmin = info_basic['for_fmin']
-        fmax = info_basic['for_fmax']
-        nf = info_basic['for_nf']
+        fmin = info_basic['BFGS_for_fmin']
+        fmax = info_basic['BFGS_for_fmax']
+        nf = info_basic['BFGS_for_nf']
         freqs = np.linspace(fmin, fmax, nf)
         periods = 1.0 / freqs[::-1]
 

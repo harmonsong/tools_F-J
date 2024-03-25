@@ -3,14 +3,6 @@ import sys
 sys.path.append(r'/home/songshuhao/anaconda3/bin/')
 
 import numpy as np
-import obspy
-from obspy import UTCDateTime
-from concurrent.futures import ThreadPoolExecutor
-import os
-import time
-from geopy.distance import great_circle
-import folium
-import matplotlib.pyplot as plt
 
 # frequency domain to time domain
 def freq_time(ncfs):
