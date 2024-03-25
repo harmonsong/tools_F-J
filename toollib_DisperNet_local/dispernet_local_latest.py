@@ -1131,7 +1131,7 @@ class App(object):
 		#self.loc_info = loc_info
 		loc_info = {}
 		for key_subwork in self.info_basic['key_subworks']:
-			filePath = self.dir_project + self.info_basic['dir_partition'] + str(key_subwork) + '.txt'
+			filePath = self.dir_project + self.info_basic['rdir_partition'] + str(key_subwork) + '.txt'
 			stations, lat, lon = np.loadtxt(filePath, dtype='str' , unpack=True)
 			stations = stations.tolist()
 			lat = lat.tolist()
@@ -1223,7 +1223,7 @@ class App(object):
 			lat = {}
 			lon = {}
 			for key_subwork in self.key_subworks:
-				filePath = self.dir_project + self.info_basic['dir_partition'] + str(key_subwork) + '.txt'
+				filePath = self.dir_project + self.info_basic['rdir_partition'] + str(key_subwork) + '.txt'
 				stations_this, lat_this, lon_this = np.loadtxt(filePath, dtype='str' , unpack=True)
 				stations[key_subwork] = stations_this.tolist()
 				lat[key_subwork] = lat_this.astype(float).tolist()

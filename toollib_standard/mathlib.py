@@ -5,8 +5,6 @@ sys.path.append(r'/home/songshuhao/anaconda3/bin/')
 import numpy as np
 import obspy
 from obspy import UTCDateTime
-#from ccfj import CC
-#from ccfj import GetStationPairs
 from concurrent.futures import ThreadPoolExecutor
 import os
 import time
@@ -26,3 +24,23 @@ def time_freq(ncfst):
     for i in range(len(ncfst)):
         ncfs[i, :] = np.fft.rfft(np.fft.ifftshift(ncfst[i, :]))
     return ncfs
+
+def GetStationPairs(nsta):
+    StationPair = []
+    for ii in range(nsta):
+        for jj in range(ii+1,nsta):
+            StationPair.append(ii)
+            StationPair.append(jj)
+    StationPair = np.array(StationPair,dtype=np.int32)
+    return StationPair
+
+def Pairs(sta):
+    p = []
+    nsta = len(sta)
+    for ii in range(nsta):
+        for jj in range(ii+1,nsta):
+            p.append([sta[ii],sta[jj]])
+    return p
+def cal_indx(pair,nsta):
+    indx = int(pair[0]*(2*nsta-pair[0]-1)/2+pair[1]-pair[0]-1)
+    return indx
