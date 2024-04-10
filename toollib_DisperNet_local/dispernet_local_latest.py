@@ -16,7 +16,10 @@ import numpy as np
 import sklearn.cluster as sc
 from scipy.cluster.vq import whiten
 from scipy import interpolate
+import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.colors import Normalize
+from matplotlib.cm import ScalarMappable
 from matplotlib.widgets import Button, Slider, CheckButtons
 import matplotlib
 import h5py
@@ -222,7 +225,7 @@ def freq2Period(inputSpec, freq, maxPeriod=0.8, scale=18, freqCount=0, kind='lin
 	return itt(newPeriod, veloRange), newPeriod
 
 
-def show(spec,curve,r_this = 0,freq=[0.,0.3], velo=[2000, 6000], unit=[], s=10, ax=[], holdon=False, cmap='viridis', vmin=None, vmax=None, xLabel='Frequency (Hz)', autoT=True):
+def show(spec,curve,r_this = 0,cc=None,freq=[0.,0.3], velo=[2000, 6000], unit=[], s=10, ax=[], holdon=False, cmap='viridis', vmin=None, vmax=None, xLabel='Frequency (Hz)', autoT=True):
 	fMax = max(freq)
 	fMin = min(freq)
 	cMax = max(velo)
@@ -256,12 +259,20 @@ def show(spec,curve,r_this = 0,freq=[0.,0.3], velo=[2000, 6000], unit=[], s=10, 
 	markerList=['*','o','v','^','s','p','d','<','>', '1', '$10$', '$11$','$12$', '$13$', '$14$', '$15$', '$16$']
 	
 	if len(curve)>0:
-		if curve.shape[1] == 2 or curve.shape[1] == 4:
-			ax.scatter(curve[...,0],curve[...,1],s=s, edgecolors='w')
+		if cc is None:
+			if curve.shape[1] == 2 or curve.shape[1] == 4:
+				ax.scatter(curve[...,0],curve[...,1],s=s, edgecolors='w')
+			else:
+				for ii in range(int(max(curve[...,-1]))+1):
+					curve_in_mode = curve[curve[:,-1] == ii]
+					ax.scatter(curve_in_mode[...,0], curve_in_mode[...,1],label='mode '+str(ii),s=s,edgecolors='k',marker=markerList[ii])
 		else:
-			for ii in range(int(max(curve[...,-1]))+1):
-				curve_in_mode = curve[curve[:,-1] == ii]
-				ax.scatter(curve_in_mode[...,0], curve_in_mode[...,1],label='mode '+str(ii),s=s,edgecolors='k',marker=markerList[ii])
+			if curve.shape[1] == 2 or curve.shape[1] == 4:
+				ax.scatter(curve[...,0],curve[...,1],s=s, edgecolors='w',color=cc)
+			else:
+				for ii in range(int(max(curve[...,-1]))+1):
+					curve_in_mode = curve[curve[:,-1] == ii]
+					ax.scatter(curve_in_mode[...,0], curve_in_mode[...,1],label='mode '+str(ii),s=s,edgecolors='k',marker=markerList[ii],color=cc)
 				
 			ax.legend()
 	
@@ -786,7 +797,7 @@ def del_curve_by_mode(curves, mode):
 			reCurve.append(point)
 	return np.array(reCurve)
 
-def find_nearset_self(self,key_subwork,key_all,loc_all,num=1):
+def find_nearset_self(self,key_subwork,key_all,loc_all,flag_near=1):
 	lon_this = self.loc_info[key_subwork][0]
 	lat_this = self.loc_info[key_subwork][1]
 	lon_all = []
@@ -797,26 +808,45 @@ def find_nearset_self(self,key_subwork,key_all,loc_all,num=1):
 			lon_all.append(loc_all[key][0])
 			lat_all.append(loc_all[key][1])
 			key_file_all.append(key)
+	
+	loc_this = np.array([lon_this,lat_this,1])
+	loc_this_new = np.dot(self.matrix,loc_this)
+	x_this = loc_this_new[0]
+	y_this = loc_this_new[1]
+	x_centroid_partition = []
+	y_centroid_partition = []
+	for i in range(len(lon_all)):
+		loc_centroid = np.array([lon_all[i],lat_all[i],1])
+		loc_centroid_new = np.dot(self.matrix,loc_centroid)
+		x_centroid_partition.append(loc_centroid_new[0])
+		y_centroid_partition.append(loc_centroid_new[1])
+			
 
 	#lon_all = loc_all['lon_centroid']
 	#lat_all = loc_all['lat_centroid']
 	# 找到最近的
-	dist = np.sqrt((lon_all-lon_this)**2+(lat_all-lat_this)**2)
-	indx = np.argsort(dist)
-
+	dist = np.sqrt((np.array(x_centroid_partition)-x_this)**2+(np.array(y_centroid_partition)-y_this)**2)
+	dist_sort = np.sort(dist)
 	key_nearset = []
 	lon_nearset = []
 	lat_nearset = []
-	
-	for i in range(num):
-		key_nearset.append(key_file_all[indx[i]])
-		lon_nearset.append(lon_all[indx[i]])
-		lat_nearset.append(lat_all[indx[i]])
+	dist_nearset = []
+	for i in range(len(dist_sort)):
+		if dist_sort[i] < flag_near:
+			if dist_sort[i] == 0:
+				continue
+			indx = np.where(dist == dist_sort[i])
+			key_nearset.append(key_file_all[indx[0][0]])
+			lon_nearset.append(lon_all[indx[0][0]])
+			lat_nearset.append(lat_all[indx[0][0]])
+			dist_nearset.append(dist_sort[i])
+		else:
+			break
 
 	#key_nearset = key_file_all[indx[0]]
 	#lon_nearset = lon_all[indx[0]]
 	#lat_nearset = lat_all[indx[0]]
-	return key_nearset,lon_nearset,lat_nearset
+	return key_nearset,lon_nearset,lat_nearset,dist_nearset
 
 def find_nearset(self,key_subwork,key_all,loc_all):
 	lon_this = self.loc_info[key_subwork][0]
@@ -828,10 +858,22 @@ def find_nearset(self,key_subwork,key_all,loc_all):
 	for key in key_all:
 		lon_all.append(loc_all['lon_centroid'][key_file_all.index(str(key))])
 		lat_all.append(loc_all['lat_centroid'][key_file_all.index(str(key))])
+	
+	loc_this = np.array([lon_this,lat_this,1])
+	loc_this_new = np.dot(self.matrix,loc_this)
+	x_this = loc_this_new[0]
+	y_this = loc_this_new[1]
+	x_centroid_partition = []
+	y_centroid_partition = []
+	for i in range(len(lon_all)):
+		loc_centroid = np.array([lon_all[i],lat_all[i],1])
+		loc_centroid_new = np.dot(self.matrix,loc_centroid)
+		x_centroid_partition.append(loc_centroid_new[0])
+		y_centroid_partition.append(loc_centroid_new[1])
 	#lon_all = loc_all['lon_centroid']
 	#lat_all = loc_all['lat_centroid']
 	# 找到最近的
-	dist = np.sqrt((lon_all-lon_this)**2+(lat_all-lat_this)**2)
+	dist = np.sqrt((np.array(x_centroid_partition)-x_this)**2+(np.array(y_centroid_partition)-y_this)**2)
 	indx = np.argsort(dist)
 	key_nearset = key_all[indx[0]]
 	return key_nearset
@@ -857,7 +899,7 @@ class App(object):
 	periodCutRate=[]
 	semiVeloRange=0.1
 	
-	def __init__(self,info_basic,lon_all,lat_all,fileList,faults = None,file_project='a-project.yml',num_near = 5,flag_plot_or = 0,flag_plot_partrition=0 ,r_flag  = 0,oldfile='None',oldkeys=[],fundfile='None',overfile = 'None',fundkeys=[],filePath='./', curveFilePath = '', freqSeries=[], cmap='viridis', vmin=None, vmax=None, url='http://10.20.11.42:8514', maxMode=0, trigerMode=False , searchStep=2, autoT=True, periodCutRate=0.125, semiAutoRange=0.1):
+	def __init__(self,info_basic,lon_all,lat_all,fileList,faults = None,file_project='a-project.yml',r_near = 10,matrix = None,flag_plot_or = 0,flag_plot_partrition=0 ,r_flag  = 0,oldfile='None',oldkeys=[],fundfile='None',overfile = 'None',fundkeys=[],filePath='./', curveFilePath = '', freqSeries=[], cmap='viridis', vmin=None, vmax=None, url='http://10.20.11.42:8514', maxMode=0, trigerMode=False , searchStep=2, autoT=True, periodCutRate=0.125, semiAutoRange=0.1):
 		self.flag_plot_partrition = flag_plot_partrition	
 		self.flag_plot_or = flag_plot_or
 		self.r_flag = r_flag
@@ -870,7 +912,8 @@ class App(object):
 		self.overfile = overfile
 
 		self.fundkeys = fundkeys
-		self.num_near = num_near
+		self.r_near = r_near
+		self.matrix = matrix
 
 		self.autoT = True
 		self.periodCutRate=periodCutRate
@@ -1328,7 +1371,7 @@ class App(object):
 		if key_this in key_all:
 			key_all.remove(key_this)
 
-		key_find,lon_find,lat_find = find_nearset_self(self,key_this,key_all,self.loc_info)
+		key_find,lon_find,lat_find,dist_find = find_nearset_self(self,key_this,key_all,self.loc_info)
 		key_find = key_find[0]
 		lon_find = lon_find[0]
 		lat_find = lat_find[0]
@@ -1361,7 +1404,7 @@ class App(object):
 		#self.ax_partition =plotlib.plot_area(self.ax_partition,lon_all,lat_all,lon,lat,markersize = 1 ,markersize2 = 4)
 
 	def AddNear(self,event):
-		num = self.num_near
+		flag_near = self.r_near
 		key_this = self.fileName[self.fileName.find('_')+1:self.fileName.find('.')]
 		if '_' in key_this:
 			key_this = key_this[:key_this.find('_')]
@@ -1371,8 +1414,11 @@ class App(object):
 		
 		print(key_this)
 
-		key_finds,lon_finds,lat_finds = find_nearset_self(self,key_this,key_all,self.loc_info,num=num)
-
+		key_finds,lon_finds,lat_finds,dist_finds = find_nearset_self(self,key_this,key_all,self.loc_info,flag_near=flag_near)
+		cmap = matplotlib.colormaps['afmhot']
+		norm = plt.Normalize(10, flag_near)
+		colors_disp = [cmap(norm(value)) for value in dist_finds]
+		colors_partition = [cmap(norm(value)) for value in dist_finds]
 		for i in range(len(key_finds)):
 			key_find = key_finds[i]
 			lon_find = lon_finds[i]
@@ -1380,16 +1426,19 @@ class App(object):
 			curve_near_file = self.curveFilePath + 'ds_'+key_find + 'curve.txt'
 			self.curve_near = np.loadtxt(curve_near_file)
 
-			print('key_ref='+key_find)
+			print('key_ref='+key_find+' dist='+str(dist_finds[i]))
 
-			show(self.spec,self.curve_near,r_this = self.r_this,freq=self.freq, velo=self.velo, s=15,ax=self.ax1,holdon=True, cmap=self.cmap, vmin=self.vmin, vmax=self.vmax, autoT=self.autoT)
+			show(self.spec,self.curve_near,cc=colors_disp[i],r_this = self.r_this,freq=self.freq, velo=self.velo, s=15,ax=self.ax1,holdon=True, cmap=self.cmap, vmin=self.vmin, vmax=self.vmax, autoT=self.autoT)
 			if self.flag_plot_or == 1:
 				#self.show_or()
 				self.ax2.cla()
-				show(self.spec_or,self.curve_near,r_this = self.r_this,freq=self.freq, velo=self.velo, s=15,ax=self.ax2,holdon=True, cmap=self.cmap, vmin=self.vmin, vmax=self.vmax, autoT=self.autoT)
+				show(self.spec_or,self.curve_near,cc=colors_disp[i],r_this = self.r_this,freq=self.freq, velo=self.velo, s=15,ax=self.ax2,holdon=True, cmap=self.cmap, vmin=self.vmin, vmax=self.vmax, autoT=self.autoT)
 			
 			# plot near partition
-			self.ax_partition.scatter(lon_find,lat_find, s=4, c='cyan', marker='^')
+			
+			for i in range(len(key_finds)):
+				self.ax_partition.scatter(lon_finds[i],lat_finds[i], s=4, c=colors_partition[i], marker='^')
+			#self.ax_partition.scatter(lon_find,lat_find, s=4, c='cyan', marker='^')
 			sta_info_all = self.sta_info_all
 			stalist = sta_info_all['stations'][key_find]
 			lat = sta_info_all['lat'][key_find]
@@ -1500,7 +1549,7 @@ class App(object):
 			self.ax1.set_title('Please Divide the curve to different mode FIRST!!')
 			return
 		
-		self.curve = curveSmooth(self.curve, sigma=10)
+		self.curve = curveSmooth(self.curve, sigma=2)
 		self.ax1.cla()
 		if self.freq_type_preset == 'Period':
 			curveP = self.curve.copy()
