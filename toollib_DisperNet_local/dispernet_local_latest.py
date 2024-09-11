@@ -246,7 +246,6 @@ def show(spec,curve,r_this = 0,cc=None,freq=[0.,0.3], velo=[2000, 6000], unit=[]
 	else:	
 		ax.imshow(np.flip(spec,0),aspect='auto', extent=[fMin, fMax, cMin, cMax], cmap=cmap, vmin=vmin, vmax=vmax)
 		
-		
 	if len(unit) == 0:
 		if cMax / 1e2 > 2:
 			unit = 'm'
@@ -899,7 +898,7 @@ class App(object):
 	periodCutRate=[]
 	semiVeloRange=0.1
 	
-	def __init__(self,info_basic,lon_all,lat_all,fileList,faults = None,file_project='a-project.yml',r_near = 10,matrix = None,flag_plot_or = 0,flag_plot_partrition=0 ,r_flag  = 0,oldfile='None',oldkeys=[],fundfile='None',overfile = 'None',fundkeys=[],filePath='./', curveFilePath = '', freqSeries=[], cmap='viridis', vmin=None, vmax=None, url='http://10.20.11.42:8514', maxMode=0, trigerMode=False , searchStep=2, autoT=True, periodCutRate=0.125, semiAutoRange=0.1):
+	def __init__(self,info_basic,lon_all,lat_all,fileList,faults = None,file_config = '0_config.yml',file_project='a-project.yml',r_near = 10,matrix = None,flag_plot_or = 0,flag_plot_partrition=0 ,r_flag  = 0,oldfile='None',oldkeys=[],fundfile='None',overfile = 'None',fundkeys=[],filePath='./', curveFilePath = '', freqSeries=[], cmap='viridis', vmin=None, vmax=None, url='http://10.20.11.42:8514', maxMode=0, trigerMode=False , searchStep=2, autoT=True, periodCutRate=0.125, semiAutoRange=0.1):
 		self.flag_plot_partrition = flag_plot_partrition	
 		self.flag_plot_or = flag_plot_or
 		self.r_flag = r_flag
@@ -921,6 +920,7 @@ class App(object):
 		self.searchStep = searchStep
 		self.semiVeloRange = semiAutoRange
 		self.file_project = file_project
+		self.file_config = file_config
 
 		self.lon_all = lon_all
 		self.lat_all = lat_all
@@ -1161,7 +1161,7 @@ class App(object):
 		with open(self.file_project, 'r', encoding='utf-8') as f:
 			proj = yaml.load(f.read(), Loader=yaml.FullLoader)
 		name_project = proj['name']
-		with open('0_config.yml', 'r', encoding='utf-8') as f:
+		with open(self.file_config, 'r', encoding='utf-8') as f:
 			dir_config = yaml.load(f.read(), Loader=yaml.FullLoader)
 		dir_project_workspace = dir_config['dir_project_workspace']
 		dir_project = os.path.join(dir_project_workspace, name_project)
