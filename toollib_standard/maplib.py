@@ -48,7 +48,7 @@ def lat_lon(sta_info,c,cr,this_map):
     this_map = station_map_add(sta_info.keys(),lats,lons,this_map,c,cr)
     return this_map
 
-def plot_single_area(sta_list,key_loc,cs,crs,zoom_rate):
+def plot_single_area(sta_list,key_loc,cs,crs,zoom_rate,map_type = None):
     # this function plot the map with incidents with a given location center
     # which generate a new map plot
     # 
@@ -56,8 +56,18 @@ def plot_single_area(sta_list,key_loc,cs,crs,zoom_rate):
     loc_standard = list(sta_list.keys())[key_loc]
     yy = sta_list[loc_standard]['lon']
     xx = sta_list[loc_standard]['lat']
-    world_map = folium.Map()
-    this_map = folium.Map(location=[xx,yy], zoom_start=zoom_rate)
+    #world_map = folium.Map()
+    if map_type == None:
+        this_map = folium.Map(location=[xx,yy], zoom_start=zoom_rate)
+    else:
+        this_map = folium.Map(
+            location=[xx,yy], zoom_start=zoom_rate, lyrs=map_type,
+            # tiles='http://webrd02.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}', # 高德街道图
+            tiles='http://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}', # 高德卫星图
+            # tiles = 'https://mt.google.com/vt/lyrs=s&x={x}&y={y}&z={z}' ,  # google 卫星图
+            # tiles='https://mt.google.com/vt/lyrs=h&x={x}&y={y}&z={z}', # google 地图
+            attr='Default'
+            )
     this_map = lat_lon(sta_list,cs[0],crs[0],this_map)
     return this_map
 
