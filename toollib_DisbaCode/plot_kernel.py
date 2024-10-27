@@ -11,7 +11,7 @@ params = {'axes.labelsize': 14,
           'legend.fontsize': 14}
 plt.rcParams.update(params)
 
-def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax):
+def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = None):
     model = np.loadtxt(file_model)
     z = model[:, 1]
     nl = model.shape[0]
@@ -43,8 +43,9 @@ def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax):
                   shading='auto',
                   vmin=vmin,
                   vmax=vmax)
-
-    zmax = z.max()
+    if zmax is None:
+        zmax = z.max()
+    
     if fmin is None:
         fmin = freqs.min()
     if fmax is None:
