@@ -110,7 +110,7 @@ def plot_ncfst_contrast_timewindow(ax,t,ncfst,label1,ncfst_or,label2,r0,title0,f
     return ax
 
 # ncfs
-def plot_ncfs(ax,f,ncfs0,r0,title0,xlim,index):
+def plot_ncfs(ax,f,ncfs0,r0,title0,xlim,index,flag_im = 0):
     indx = np.argsort(r0)
     r  = r0[indx]
     ncfs1 = ncfs0[indx,:]
@@ -120,7 +120,7 @@ def plot_ncfs(ax,f,ncfs0,r0,title0,xlim,index):
             continue
         ncfs[i,:] = ncfs1[i,:]/np.max(np.real(ncfs1[i,:]))
 
-    ax.imshow(np.flip(np.real(ncfs),0), extent=[min(f),max(f), min(r0), max(r0)], aspect='auto',cmap='jet',vmin=-0.5,vmax=0.5)
+    im = ax.imshow(np.flip(np.real(ncfs),0), extent=[min(f),max(f), min(r0), max(r0)], aspect='auto',cmap='jet',vmin=-0.5,vmax=0.5)
     ax.set_xlim(xlim)
     if index == 0:
         ax.set_title(title0)
@@ -128,7 +128,10 @@ def plot_ncfs(ax,f,ncfs0,r0,title0,xlim,index):
         ax.set_title('('+chr(96+index)+')',loc='left')
     #ax.set_xlabel('Frequency/Hz')
     #ax.set_ylabel('Station pair distance/km')
-    return ax
+    if flag_im:
+        return im,ax
+    else:
+        return ax
 
 
 def plot_ncfs_pairs(ax,f,ncfs0,r0,title0,flag_time,xlim,index):
@@ -176,8 +179,8 @@ def plot_ncfs_pair_contrast(ax,f,ncfs,label1,ncfs_or,label2,r0,title0,flag_time,
 
 
 # fj
-def plot_fj(ax,ds_linear,title0,f,c,index,v_min=0.1,v_max=1,c_map='jet'):
-    ax.imshow(np.flip(ds_linear,0),aspect='auto',extent=[min(f),max(f),min(c),max(c)],vmin=v_min,vmax = v_max, cmap = c_map)
+def plot_fj(ax,ds_linear,title0,f,c,index,v_min=0.1,v_max=1,c_map='jet',flag_im = 0 ):
+    im = ax.imshow(np.flip(ds_linear,0),aspect='auto',extent=[min(f),max(f),min(c),max(c)],vmin=v_min,vmax = v_max, cmap = c_map)
     #plt.imshow(np.flip(ds_linear,0),extent=[min(f),max(f),min(c),max(c)],aspect='auto',cmap='jet',vmin=0,vmax=1)
     #ax.pcolormesh(f,c,ds_linear,cmap='jet',vmin=0,vmax=1)
     if index == 0:
@@ -187,7 +190,10 @@ def plot_fj(ax,ds_linear,title0,f,c,index,v_min=0.1,v_max=1,c_map='jet'):
     #ax.set_xlabel('Normalized Frequency/ Hz')
     #ax.set_ylabel('Velocity/ m/s')
     #ax.set_xlim(xlim)
-    return ax
+    if flag_im:
+        return im, ax
+    else:
+        return ax
 
 """
 def plot_fj_T(ax,ds_linear,title0,T,c,index):

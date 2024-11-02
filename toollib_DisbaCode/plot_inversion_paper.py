@@ -159,8 +159,8 @@ def plot_model(config_inv, sid, plot_init,file_model_output,file_model_data,ax,f
         file_model_data = None
 
 
-    unit = 'km'
-    km2m = 1
+    unit = 'm'
+    km2m = 1e3
 
     #plt.figure()
     model_init = np.loadtxt(dir_this + file_model_init)

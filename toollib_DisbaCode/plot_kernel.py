@@ -13,7 +13,7 @@ plt.rcParams.update(params)
 
 def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = None):
     model = np.loadtxt(file_model)
-    z = model[:, 1]
+    z = model[:, 1]*1e3
     nl = model.shape[0]
     disp = np.loadtxt(file_disp)
     disp = disp[disp[:, 2] == mode, :]
@@ -45,6 +45,7 @@ def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = Non
                   vmax=vmax)
     if zmax is None:
         zmax = z.max()
+    zmax = zmax*1e3
     
     if fmin is None:
         fmin = freqs.min()
@@ -55,7 +56,7 @@ def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = Non
     ax.set_ylim([0.0, zmax])
 
     ax.set_xlabel('Frequency (Hz)')
-    ax.set_ylabel('Depth (km)')
+    ax.set_ylabel('Depth (m)')
     ax.tick_params('both')
     ax.invert_yaxis()
 
