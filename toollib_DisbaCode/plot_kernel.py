@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 from dpcxx import GradientEval
+import matplotlib.colors as mcolors
 
 params = {'axes.labelsize': 14,
           'axes.titlesize': 16,
@@ -11,7 +12,7 @@ params = {'axes.labelsize': 14,
           'legend.fontsize': 14}
 plt.rcParams.update(params)
 
-def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = None):
+def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = None,flag_cb=0,fig=None):
     model = np.loadtxt(file_model)
     z = model[:, 1]*1e3
     nl = model.shape[0]
@@ -59,6 +60,16 @@ def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = Non
     ax.set_ylabel('Depth (m)')
     ax.tick_params('both')
     ax.invert_yaxis()
+
+    if flag_cb:
+        cmap = plt.cm.seismic
+        new_cmap = mcolors.LinearSegmentedColormap.from_list('custom_cmap', cmap(np.linspace(0.5, 1, 256)))
+        norm = mcolors.Normalize(vmin=0, vmax=0.3)
+        mappable = plt.cm.ScalarMappable(norm=norm, cmap=new_cmap)
+        mappable.set_array([])  # 设置空数组以避免警告
+        cb = fig.colorbar(mappable, ax=ax, orientation='vertical', shrink=0.6,aspect=20,pad = -0.2)
+        cb.set_ticks([0,0.1,0.2,0.3])
+        cb.ax.yaxis.set_ticks_position('left')
 
     if plot_dispersion:
         ax.tick_params('y', colors='r')
