@@ -53,7 +53,7 @@ class InversionMultiple(object):
         self.init_method = config.get('init_method', 'random')
         self.model_init = config['model_init']
         self.options = config.get('option_bfgs', dict())
-        self.outdir = config['dir_output']
+        self.outdir = config['dir_output'] + '/'
 
 
     def terminate_slaves(self):
@@ -208,7 +208,7 @@ if __name__ == '__main__':
 
         with open(file_config, 'r') as fp:
             config = yaml.safe_load(fp)
-        dir_output = config['dir_output']
+        dir_output = config['dir_output'] + '/'
         #if os.path.exists(dir_output):
         #    shutil.rmtree(dir_output)
         #os.makedirs(dir_output)

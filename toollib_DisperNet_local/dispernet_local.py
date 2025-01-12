@@ -194,7 +194,7 @@ def freq2Period(inputSpec, freq, maxPeriod=0.5, scale=18, freqCount=0, kind='lin
 	newPeriod = np.linspace(min(period), max(period), freqCount)
 	return itt(newPeriod, veloRange), newPeriod
 	
-def show(spec,curve,freq=[0.,0.3], velo=[2000, 6000], unit=[], s=10, ax=[], holdon=False, cmap='viridis', vmin=None, vmax=None, xLabel='Frequency (Hz)', autoT=True):
+def show(spec,curve,freq=[], velo=[], unit=[], s=10, ax=[], holdon=False, cmap='viridis', vmin=None, vmax=None, xLabel='Frequency (Hz)', autoT=True):
 	fMax = max(freq)
 	fMin = min(freq)
 	cMax = max(velo)
@@ -215,12 +215,14 @@ def show(spec,curve,freq=[0.,0.3], velo=[2000, 6000], unit=[], s=10, ax=[], hold
 	else:	
 		ax.imshow(np.flip(spec,0),aspect='auto', extent=[fMin, fMax, cMin, cMax], cmap=cmap, vmin=vmin, vmax=vmax)
 		
-		
+	"""
 	if len(unit) == 0:
 		if cMax / 1e2 > 2:
 			unit = 'm'
 		else:
 			unit = 'km'
+	"""
+	unit = 'km'
 			
 	ax.set_xlabel(xLabel)
 	ax.set_ylabel('Phase Velocity ('+unit+')')
@@ -1409,10 +1411,10 @@ class App(object):
 					xIndx = np.around(((x - np.min(self.period)) / (np.max(self.period) - np.min(self.period)) * self.pSpec.shape[1]))
 					yIndx = np.around(((y - np.min(self.velo)) / (np.max(self.velo) - np.min(self.velo)) * self.pSpec.shape[0]))
 					ySearchRange= int(self.pSpec.shape[0] * self.semiVeloRange)
-					searchLowerBound = np.max([np.int(yIndx - ySearchRange), 0])
-					searchUpperBound = np.min([np.int(yIndx + ySearchRange), self.pSpec.shape[0]-1])
+					searchLowerBound = np.max([int(yIndx - ySearchRange), 0])
+					searchUpperBound = np.min([int(yIndx + ySearchRange), self.pSpec.shape[0]-1])
 					
-					searchSeries = self.pSpec[searchLowerBound:searchUpperBound, np.int(xIndx)]
+					searchSeries = self.pSpec[searchLowerBound:searchUpperBound, int(xIndx)]
 					maxAmp = np.max(searchSeries)
 					yMaxInd = np.mean(np.argwhere(searchSeries==maxAmp)) + searchLowerBound
 #					yMaxInd = np.argmax(searchSeries) + searchLowerBound
@@ -1422,10 +1424,10 @@ class App(object):
 					xIndx = np.around(((x - np.min(self.freq)) / (np.max(self.freq) - np.min(self.freq)) * self.spec.shape[1]))
 					yIndx = np.around(((y - np.min(self.velo)) / (np.max(self.velo) - np.min(self.velo)) * self.spec.shape[0]))
 					ySearchRange= int(self.spec.shape[0] * self.semiVeloRange)
-					searchLowerBound = np.max([np.int(yIndx - ySearchRange), 0])
-					searchUpperBound = np.min([np.int(yIndx + ySearchRange), self.spec.shape[0]-1])
+					searchLowerBound = np.max([int(yIndx - ySearchRange), 0])
+					searchUpperBound = np.min([int(yIndx + ySearchRange), self.spec.shape[0]-1])
 					
-					searchSeries = self.spec[searchLowerBound:searchUpperBound, np.int(xIndx)]
+					searchSeries = self.spec[searchLowerBound:searchUpperBound, int(xIndx)]
 					maxAmp = np.max(searchSeries)
 					yMaxInd = np.mean(np.argwhere(searchSeries==maxAmp)) + searchLowerBound
 					newY = yMaxInd / self.spec.shape[0] * (np.max(self.velo) - np.min(self.velo)) + np.min(self.velo)

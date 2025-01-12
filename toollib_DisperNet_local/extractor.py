@@ -4,11 +4,11 @@ import numpy as np
 import os
 
 #os.chdir("/home/harmon/data/Codes/FJ-codes/DisperNetLocal/")
-
+dir_this = os.path.dirname(os.path.abspath(__file__)) + '/'
 model_file_DAS = 'disperNet_models/CED_ssh_5.h5'
 #print(os.path.abspath(model_file_DAS))
 
-model_das = keras.models.load_model(model_file_DAS)    # Read Model
+model_das = keras.models.load_model(dir_this+model_file_DAS)    # Read Model
 #model_modeSeparation = keras.models.load_model(model_file_modeSeparation) 
 
 
