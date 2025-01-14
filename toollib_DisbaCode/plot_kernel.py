@@ -12,7 +12,7 @@ params = {'axes.labelsize': 14,
           'legend.fontsize': 14}
 plt.rcParams.update(params)
 
-def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = None,flag_cb=0,fig=None,unit='km'):
+def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = None,flag_cb=0,fig=None,unit='km',labels = 0):
     model = np.loadtxt(file_model)
     if unit == 'km':
         z = model[:, 1]*1e3
@@ -25,6 +25,7 @@ def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = Non
     freqs = disp[:, 0]
     cs = disp[:, 1]
 
+    handles = []
 
     wave_type = 'rayleigh'
     plot_dispersion = 1
@@ -40,7 +41,7 @@ def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = Non
         vmax = np.amax(np.abs(ker))
     vmin = -vmax
     #print("vmax = ", vmax)
-    ax.pcolormesh(freqs,
+    p1, = ax.pcolormesh(freqs,
                   z,
                   ker,
                   cmap='seismic',
@@ -65,6 +66,8 @@ def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = Non
     ax.tick_params('both')
     ax.invert_yaxis()
 
+    handles.append(p1)
+
     if flag_cb:
         cmap = plt.cm.seismic
         new_cmap = mcolors.LinearSegmentedColormap.from_list('custom_cmap', cmap(np.linspace(0.5, 1, 256)))
@@ -79,12 +82,16 @@ def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = Non
         ax.tick_params('y', colors='r')
         ax.yaxis.label.set_color('r')
         ax2 = ax.twinx()
-        ax2.plot(freqs, cs, 'k.-')
+        p2, = ax2.plot(freqs, cs, 'k.-')
         ax2.tick_params('y', colors='k')
         ax2.set_xlim([fmin, fmax])
         if cmin is not None and cmax is not None:
             ax2.set_ylim([cmin, cmax])
         ax2.set_ylabel('Phase velocity (km/s)')
+        handles.append(p2)
+
+    if labels != 0:
+        plt.legend(handles,labels)
 
     return ax,ax2
 
