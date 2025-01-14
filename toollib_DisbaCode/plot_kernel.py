@@ -12,9 +12,12 @@ params = {'axes.labelsize': 14,
           'legend.fontsize': 14}
 plt.rcParams.update(params)
 
-def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = None,flag_cb=0,fig=None):
+def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = None,flag_cb=0,fig=None,unit='km'):
     model = np.loadtxt(file_model)
-    z = model[:, 1]*1e3
+    if unit == 'km':
+        z = model[:, 1]*1e3
+    else:
+        z = model[:, 1]
     nl = model.shape[0]
     disp = np.loadtxt(file_disp)
     disp = disp[disp[:, 2] == mode, :]
@@ -46,7 +49,8 @@ def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = Non
                   vmax=vmax)
     if zmax is None:
         zmax = z.max()
-    zmax = zmax*1e3
+    if unit == 'km':
+        zmax = zmax*1e3
     
     if fmin is None:
         fmin = freqs.min()
