@@ -88,7 +88,7 @@ def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = Non
             ax2.set_ylim([cmin, cmax])
         ax2.set_ylabel('Phase velocity (km/s)')
 
-    return ax,ax2
+    return ax,ax2, mappable
 
 """
 
