@@ -12,7 +12,7 @@ params = {'axes.labelsize': 14,
           'legend.fontsize': 14}
 plt.rcParams.update(params)
 
-def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = None,flag_cb=0,fig=None,unit='km',labels = 0):
+def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = None,flag_cb=0,fig=None,unit='km'):
     model = np.loadtxt(file_model)
     if unit == 'km':
         z = model[:, 1]*1e3
@@ -41,7 +41,7 @@ def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = Non
         vmax = np.amax(np.abs(ker))
     vmin = -vmax
     #print("vmax = ", vmax)
-    p1, = ax.pcolormesh(freqs,
+    ax.pcolormesh(freqs,
                   z,
                   ker,
                   cmap='seismic',
@@ -50,8 +50,8 @@ def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = Non
                   vmax=vmax)
     if zmax is None:
         zmax = z.max()
-    if unit == 'km':
-        zmax = zmax*1e3
+    #if unit == 'km':
+    #    zmax = zmax*1e3
     
     if fmin is None:
         fmin = freqs.min()
@@ -66,32 +66,27 @@ def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = Non
     ax.tick_params('both')
     ax.invert_yaxis()
 
-    handles.append(p1)
-
+    mappable = 0
     if flag_cb:
         cmap = plt.cm.seismic
         new_cmap = mcolors.LinearSegmentedColormap.from_list('custom_cmap', cmap(np.linspace(0.5, 1, 256)))
-        norm = mcolors.Normalize(vmin=0, vmax=0.3)
+        norm = mcolors.Normalize(vmin=0, vmax=0.8)
         mappable = plt.cm.ScalarMappable(norm=norm, cmap=new_cmap)
         mappable.set_array([])  # 设置空数组以避免警告
-        cb = fig.colorbar(mappable, ax=ax, orientation='vertical', shrink=0.6,aspect=20,pad = -0.2)
-        cb.set_ticks([0,0.1,0.2,0.3])
+        cb = fig.colorbar(mappable, ax=ax, extend = 'both', orientation='vertical', fraction = 0.04, shrink=0.3,aspect=20,pad = -0.1)
+        #cb.set_ticks([0,0.1,0.2,0.3])
         cb.ax.yaxis.set_ticks_position('left')
 
     if plot_dispersion:
         ax.tick_params('y', colors='r')
         ax.yaxis.label.set_color('r')
         ax2 = ax.twinx()
-        p2, = ax2.plot(freqs, cs, 'k.-')
+        ax2.plot(freqs, cs, 'k.-')
         ax2.tick_params('y', colors='k')
         ax2.set_xlim([fmin, fmax])
         if cmin is not None and cmax is not None:
             ax2.set_ylim([cmin, cmax])
         ax2.set_ylabel('Phase velocity (km/s)')
-        handles.append(p2)
-
-    if labels != 0:
-        plt.legend(handles,labels)
 
     return ax,ax2
 
