@@ -74,9 +74,10 @@ def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = Non
         #norm = mcolors.Normalize(vmin=0, vmax=0.8)
         mappable = plt.cm.ScalarMappable(norm=norm, cmap=new_cmap)
         mappable.set_array([])  # 设置空数组以避免警告
-        cb = fig.colorbar(mappable, ax=ax, orientation='vertical', shrink=0.6,aspect=20,pad = -0.2)
+        cb = fig.colorbar(mappable, ax=ax, orientation='vertical', shrink=0.5,aspect=20,pad = -0.35)
+        #cb = fig.colorbar(mappable, ax=ax, orientation='vertical', shrink=0.6,aspect=20,pad = -0.2)
         #cb = fig.colorbar(mappable, ax=ax, extend = 'both', orientation='vertical', fraction = 0.04, shrink=0.3,aspect=20,pad = -0.1)
-        #cb.set_ticks([0,0.1,0.2,0.3])
+        cb.set_ticks([0,0.1,0.2,0.3])
         cb.ax.yaxis.set_ticks_position('left')
 
     if plot_dispersion:
@@ -90,7 +91,7 @@ def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = Non
             ax2.set_ylim([cmin, cmax])
         ax2.set_ylabel('Phase velocity (km/s)')
 
-    return ax,ax2, mappable
+    return ax,ax2, mappable,cb
 
 """
 
