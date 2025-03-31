@@ -90,8 +90,10 @@ def kernel_plot(fmin,fmax,cmin,cmax,file_disp,file_model,mode,vmax,ax,zmax = Non
         if cmin is not None and cmax is not None:
             ax2.set_ylim([cmin, cmax])
         ax2.set_ylabel('Phase velocity (km/s)')
-
-    return ax,ax2, mappable,cb
+    if flag_cb:
+        return ax,ax2, mappable,cb
+    else:
+        return ax,ax2, mappable
 
 """
 
