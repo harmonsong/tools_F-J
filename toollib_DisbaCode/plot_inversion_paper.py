@@ -15,7 +15,7 @@ params = {'axes.labelsize': 10,
           'legend.fontsize': 8}
 plt.rcParams.update(params)
 """
-plt.style.use('tomo_paper.mplstyle')
+#plt.style.use('tomo_paper.mplstyle')
 
 def kde_scipy(x, x_grid, weights):
     if len(x) == 1:
